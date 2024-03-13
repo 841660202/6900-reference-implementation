@@ -37,20 +37,25 @@ contract AccountLoupeTest is OptimizedTest {
     event ReceivedCall(bytes msgData, uint256 msgValue);
 
     function setUp() public {
+        // 实例化
         entryPoint = new EntryPoint();
-
+        // 部署插件
         singleOwnerPlugin = _deploySingleOwnerPlugin();
+        // 实例化工厂
         factory = new MSCAFactoryFixture(entryPoint, singleOwnerPlugin);
+        // 实例化插件
         comprehensivePlugin = new ComprehensivePlugin();
 
         account1 = factory.createAccount(address(this), 0);
 
         bytes32 manifestHash = keccak256(abi.encode(comprehensivePlugin.pluginManifest()));
+        // 安装插件
         account1.installPlugin(address(comprehensivePlugin), manifestHash, "", new FunctionReference[](0));
-
+        // userOp校验
         ownerUserOpValidation = FunctionReferenceLib.pack(
             address(singleOwnerPlugin), uint8(ISingleOwnerPlugin.FunctionId.USER_OP_VALIDATION_OWNER)
         );
+        // 运行时校验
         ownerRuntimeValidation = FunctionReferenceLib.pack(
             address(singleOwnerPlugin), uint8(ISingleOwnerPlugin.FunctionId.RUNTIME_VALIDATION_OWNER_OR_SELF)
         );

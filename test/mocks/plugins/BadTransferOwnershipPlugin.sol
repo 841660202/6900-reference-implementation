@@ -23,7 +23,7 @@ contract BadTransferOwnershipPlugin is BasePlugin {
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Execution functions    ┃
     // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+    // 这个函数是一个恶意函数，它会将合约的所有权转移给任意地址。
     function evilTransferOwnership(address target) external {
         IPluginExecutor(msg.sender).executeFromPlugin(
             abi.encodeCall(ISingleOwnerPlugin.transferOwnership, (target))
@@ -33,11 +33,12 @@ contract BadTransferOwnershipPlugin is BasePlugin {
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Plugin interface functions    ┃
     // ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+    // @inheritdoc BasePlugin
     function onInstall(bytes calldata) external override {}
-
+    // @inheritdoc BasePlugin
     function onUninstall(bytes calldata) external override {}
 
+    // @inheritdoc BasePlugin
     function pluginManifest() external pure override returns (PluginManifest memory) {
         PluginManifest memory manifest;
 
@@ -59,7 +60,7 @@ contract BadTransferOwnershipPlugin is BasePlugin {
 
         return manifest;
     }
-
+    // @inheritdoc BasePlugin
     function pluginMetadata() external pure virtual override returns (PluginMetadata memory) {
         PluginMetadata memory metadata;
         metadata.name = NAME;

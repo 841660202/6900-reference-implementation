@@ -73,6 +73,8 @@ contract AccountExecHooksTest is OptimizedTest {
     }
 
     function test_preExecHook_install() public {
+
+        // _installPlugin1WithHooks(bytes4 selector, ManifestFunction preHook, ManifestFunction postHook) 
         _installPlugin1WithHooks(
             _EXEC_SELECTOR,
             ManifestFunction({
@@ -93,15 +95,16 @@ contract AccountExecHooksTest is OptimizedTest {
         emit ReceivedCall(
             abi.encodeWithSelector(
                 IPlugin.preExecutionHook.selector,
-                _PRE_HOOK_FUNCTION_ID_1,
+                _PRE_HOOK_FUNCTION_ID_1, // functionId
                 address(this), // caller
                 0, // msg.value in call to account
-                abi.encodeWithSelector(_EXEC_SELECTOR)
+                abi.encodeWithSelector(_EXEC_SELECTOR) // 下面对应这个函数，这个函数之前会调用 preExecutionHook
             ),
             0 // msg value in call to plugin
         );
 
-        (bool success,) = address(account).call(abi.encodeWithSelector(_EXEC_SELECTOR));
+        // 这里执行了一个函数调用，调用的是 account 合约的 _EXEC_SELECTOR 函数
+        (bool success,) = address(account).call(abi.encodeWithSelector(_EXEC_SELECTOR)); // 0x00000001
         assertTrue(success);
     }
 
@@ -296,12 +299,14 @@ contract AccountExecHooksTest is OptimizedTest {
         m1.executionHooks.push(ManifestExecutionHook(selector, preHook, postHook));
         mockPlugin1 = new MockPlugin(m1);
         manifestHash1 = keccak256(abi.encode(mockPlugin1.pluginManifest()));
-
+        // 测试预期
         vm.expectEmit(true, true, true, true);
         emit ReceivedCall(abi.encodeCall(IPlugin.onInstall, (bytes(""))), 0);
+        // 测试预期安装完成
         vm.expectEmit(true, true, true, true);
         emit PluginInstalled(address(mockPlugin1), manifestHash1, new FunctionReference[](0));
 
+        // 执行安装
         account.installPlugin({
             plugin: address(mockPlugin1),
             manifestHash: manifestHash1,

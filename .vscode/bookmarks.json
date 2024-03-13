@@ -1,0 +1,159 @@
+{
+	"files": [
+		{
+			"path": "src/account/AccountExecutor.sol",
+			"bookmarks": [
+				{
+					"line": 20,
+					"column": 4,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/account/AccountLoupe.t.sol",
+			"bookmarks": [
+				{
+					"line": 40,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 44,
+					"column": 4,
+					"label": ""
+				},
+				{
+					"line": 48,
+					"column": 8,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/account/AccountReturnData.t.sol",
+			"bookmarks": [
+				{
+					"line": 33,
+					"column": 28,
+					"label": ""
+				},
+				{
+					"line": 85,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 86,
+					"column": 12,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/utils/OptimizedTest.sol",
+			"bookmarks": [
+				{
+					"line": 72,
+					"column": 4,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/mocks/plugins/ReturnDataPluginMocks.sol",
+			"bookmarks": [
+				{
+					"line": 74,
+					"column": 4,
+					"label": ""
+				},
+				{
+					"line": 96,
+					"column": 4,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/mocks/plugins/ExecFromPluginPermissionsMocks.sol",
+			"bookmarks": [
+				{
+					"line": 121,
+					"column": 8,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "src/account/UpgradeableModularAccount.sol",
+			"bookmarks": [
+				{
+					"line": 212,
+					"column": 4,
+					"label": ""
+				},
+				{
+					"line": 256,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 476,
+					"column": 4,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "src/account/PluginManagerInternals.sol",
+			"bookmarks": [
+				{
+					"line": 444,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 450,
+					"column": 8,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "test/account/ExecuteFromPluginPermissions.t.sol",
+			"bookmarks": [
+				{
+					"line": 63,
+					"column": 0,
+					"label": ""
+				},
+				{
+					"line": 71,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 81,
+					"column": 8,
+					"label": ""
+				},
+				{
+					"line": 98,
+					"column": 4,
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "src/account/AccountStorage.sol",
+			"bookmarks": [
+				{
+					"line": 74,
+					"column": 4,
+					"label": ""
+				}
+			]
+		}
+	]
+}

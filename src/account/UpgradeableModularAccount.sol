@@ -224,6 +224,7 @@ contract UpgradeableModularAccount is
         }
 
         // Check the caller plugin's permission to make this call
+        // 检查调用插件是否有权限进行此调用
 
         // Check the target contract permission.
         // This first checks that the intended target is permitted at all. If it is, then it checks if any selector
@@ -232,6 +233,10 @@ contract UpgradeableModularAccount is
         // By checking in the order of [address specified with any selector allowed], [any address allowed],
         // [address specified and selector specified], along with the extra bool `permittedCall`, we can
         // reduce the number of `sload`s in the worst-case from 3 down to 2.
+        // 检查目标合约权限。
+        // 首先检查是否允许使用目标合约。如果允许，则检查是否允许任何选择器。如果允许任何选择器，则跳过选择器级别的权限检查。
+        // 如果只允许一部分选择器，则还需要检查选择器级别的权限。
+        // 通过按照[指定地址并允许任何选择器]、[允许任何地址]、[指定地址并指定选择器]的顺序检查，以及额外的布尔值`permittedCall`，我们可以将最坏情况下的`sload`数量从3减少到2。
         bool targetContractPermittedCall = _storage.permittedExternalCalls[IPlugin(msg.sender)][target]
             .addressPermitted
             && (
@@ -241,20 +246,24 @@ contract UpgradeableModularAccount is
 
         // If the target contract is not permitted, check if the caller plugin is permitted to make any external
         // calls.
+        // 如果目标合约没有被允许，检查调用插件是否被允许进行任何外部调用。
         if (!(targetContractPermittedCall || _storage.pluginData[msg.sender].anyExternalExecPermitted)) {
+            // 提示插件不允许进行任何外部调用。
             revert ExecFromPluginExternalNotPermitted(msg.sender, target, value, data);
         }
-
+// 执行前钩子
         // Run any pre exec hooks for this selector
-        PostExecToRun[] memory postExecHooks =
-            _doPreExecHooks(IPluginExecutor.executeFromPluginExternal.selector, msg.data);
-
+        // 运行此选择器的任何预执行钩子
+        PostExecToRun[] memory postExecHooks = _doPreExecHooks(IPluginExecutor.executeFromPluginExternal.selector, msg.data);
+// 执行
         // Perform the external call
+        // 执行外部调用，会检测“不会直接与插件合约进行交互”
         bytes memory returnData = _exec(target, value, data);
 
+// 执行后钩子
         // Run any post exec hooks for this selector
+        // 运行此选择器的任何后执行钩子
         _doCachedPostExecHooks(postExecHooks);
-
         return returnData;
     }
 
@@ -454,7 +463,7 @@ contract UpgradeableModularAccount is
             }
         }
     }
-
+    // 这个函数是用来执行前钩子的，执行前钩子的时候，会返回一个后钩子的数组
     function _doPreExecHooks(bytes4 selector, bytes calldata data)
         internal
         returns (PostExecToRun[] memory postHooksToRun)
@@ -478,6 +487,7 @@ contract UpgradeableModularAccount is
         uint256 actualPostHooksToRunLength;
 
         // Copy post-only hooks to the array.
+        // 将只有后钩子的钩子复制到数组中
         for (uint256 i = 0; i < postOnlyHooksLength;) {
             (bytes32 key,) = hooks.postOnlyHooks.at(i);
             postHooksToRun[actualPostHooksToRunLength].postExecHook = _toFunctionReference(key);
@@ -489,21 +499,26 @@ contract UpgradeableModularAccount is
 
         // Then run the pre hooks and copy the associated post hooks (along with their pre hook's return data) to
         // the array.
+        // 然后运行前钩子，并将相关的后钩子（以及它们的前钩子的返回数据）复制到数组中
         for (uint256 i = 0; i < preExecHooksLength;) {
             (bytes32 key,) = hooks.preHooks.at(i);
             FunctionReference preExecHook = _toFunctionReference(key);
-
+            // 这里判断了前钩子是否为空或者是魔术值
             if (preExecHook.isEmptyOrMagicValue()) {
                 // The function reference must be PRE_HOOK_ALWAYS_DENY in this case, because zero and any other
                 // magic value is unassignable here.
+                // 这个函数引用在这种情况下必须是_PRE_HOOK_ALWAYS_DENY，因为0和任何其他魔术值在这里都是不可分配的。
                 revert AlwaysDenyRule();
             }
-
+            // 执行前钩子
             bytes memory preExecHookReturnData = _runPreExecHook(preExecHook, data);
-
+// 前钩子执行完后，将相关的后钩子（以及它们的前钩子的返回数据）复制到数组中            
             uint256 associatedPostExecHooksLength = hooks.associatedPostHooks[preExecHook].length();
+
+// 将相关的后钩子（以及它们的前钩子的返回数据）复制到数组中
             if (associatedPostExecHooksLength > 0) {
                 for (uint256 j = 0; j < associatedPostExecHooksLength;) {
+                    // 这个key是后钩子的函数引用
                     (key,) = hooks.associatedPostHooks[preExecHook].at(j);
                     postHooksToRun[actualPostHooksToRunLength].postExecHook = _toFunctionReference(key);
                     postHooksToRun[actualPostHooksToRunLength].preExecHookReturnData = preExecHookReturnData;

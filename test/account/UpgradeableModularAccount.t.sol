@@ -110,13 +110,14 @@ contract UpgradeableModularAccountTest is OptimizedTest {
     }
 
     function test_standardExecuteEthSend() public {
+        // 接收者地址
         address payable recipient = payable(makeAddr("recipient"));
 
         UserOperation memory userOp = UserOperation({
             sender: address(account1),
             nonce: 0,
             initCode: abi.encodePacked(address(factory), abi.encodeCall(factory.createAccount, (owner1, 0))),
-            callData: abi.encodeCall(UpgradeableModularAccount.execute, (recipient, 1 wei, "")),
+            callData: abi.encodeCall(UpgradeableModularAccount.execute, (recipient, 1 wei, "")), // 接收者地址
             callGasLimit: CALL_GAS_LIMIT,
             verificationGasLimit: VERIFICATION_GAS_LIMIT,
             preVerificationGas: 0,
@@ -138,7 +139,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
 
         assertEq(recipient.balance, 1 wei);
     }
-
+// 验证一个用户操作（UserOperation）是否能够成功地将以太币发送到指定的接收者（ethRecipient）
     function test_postDeploy_ethSend() public {
         UserOperation memory userOp = UserOperation({
             sender: address(account2),
@@ -166,7 +167,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
 
         assertEq(ethRecipient.balance, 2 wei);
     }
-
+// 
     function test_debug_upgradeableModularAccount_storageAccesses() public {
         UserOperation memory userOp = UserOperation({
             sender: address(account2),
@@ -194,7 +195,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         entryPoint.handleOps(userOps, beneficiary);
         _printStorageReadsAndWrites(address(account2));
     }
-
+    // 测试与合约交互
     function test_contractInteraction() public {
         UserOperation memory userOp = UserOperation({
             sender: address(account2),
@@ -224,7 +225,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
 
         assertEq(counter.number(), 2);
     }
-
+    // 测试批量执行
     function test_batchExecute() public {
         // Performs both an eth send and a contract interaction with counter
         Call[] memory calls = new Call[](2);
@@ -258,7 +259,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         assertEq(counter.number(), 2);
         assertEq(ethRecipient.balance, 2 wei);
     }
-
+    // 测试插件的安装
     function test_installPlugin() public {
         vm.startPrank(owner2);
 
@@ -278,7 +279,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         assertEq(plugins[0], address(singleOwnerPlugin));
         assertEq(plugins[1], address(tokenReceiverPlugin));
     }
-
+    // 测试插
     function test_installPlugin_ExecuteFromPlugin_PermittedExecSelectorNotInstalled() public {
         vm.startPrank(owner2);
 
@@ -308,7 +309,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
             dependencies: new FunctionReference[](0)
         });
     }
-
+    // 测试安装接口不支持的插件
     function test_installPlugin_interfaceNotSupported() public {
         vm.startPrank(owner2);
 
@@ -323,7 +324,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
             dependencies: new FunctionReference[](0)
         });
     }
-
+    // 测试重复安全插件
     function test_installPlugin_alreadyInstalled() public {
         vm.startPrank(owner2);
 
@@ -347,7 +348,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
             dependencies: new FunctionReference[](0)
         });
     }
-
+    // 测试默认卸载插件
     function test_uninstallPlugin_default() public {
         vm.startPrank(owner2);
 
@@ -367,7 +368,7 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         assertEq(plugins.length, 1);
         assertEq(plugins[0], address(singleOwnerPlugin));
     }
-
+    // 测试插件卸载
     function test_uninstallPlugin_manifestParameter() public {
         vm.startPrank(owner2);
 
@@ -421,6 +422,9 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         assertEq(plugins[1], address(plugin));
     }
 
+    
+    // Internal Functions
+
     function _installPluginWithExecHooks() internal returns (MockPlugin plugin) {
         vm.startPrank(owner2);
 
@@ -437,7 +441,6 @@ contract UpgradeableModularAccountTest is OptimizedTest {
         vm.stopPrank();
     }
 
-    // Internal Functions
 
     function _printStorageReadsAndWrites(address addr) internal {
         (bytes32[] memory accountReads, bytes32[] memory accountWrites) = vm.accesses(addr);

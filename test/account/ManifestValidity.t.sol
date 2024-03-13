@@ -21,7 +21,7 @@ import {
     BadHookMagicValue_PostExecHook_Plugin
 } from "../mocks/plugins/ManifestValidityMocks.sol";
 import {OptimizedTest} from "../utils/OptimizedTest.sol";
-
+// 这个测试用例测试了插件的清单是否有效。
 contract ManifestValidityTest is OptimizedTest {
     EntryPoint public entryPoint; // Just to be able to construct the factory
     SingleOwnerPlugin public singleOwnerPlugin;
@@ -36,17 +36,19 @@ contract ManifestValidityTest is OptimizedTest {
 
         // Create an account with "this" as the owner, so we can execute along the runtime path with regular
         // solidity semantics
+        // 创建一个账户，它的 owner 是 this，这样我们就可以使用普通的 solidity 语义来执行运行时路径。
         account = factory.createAccount(address(this), 0);
     }
 
     // Tests that the plugin manager rejects a plugin with a user op validationFunction set to "validation always
     // allow"
+    // 测试插件管理器是否拒绝了一个用户操作验证函数设置为“始终允许验证”的插件
     function test_ManifestValidity_invalid_ValidationAlwaysAllow_UserOpValidationFunction() public {
         BadValidationMagicValue_UserOp_Plugin plugin = new BadValidationMagicValue_UserOp_Plugin();
 
         bytes32 manifestHash = keccak256(abi.encode(plugin.pluginManifest()));
 
-        vm.expectRevert(abi.encodeWithSelector(PluginManagerInternals.InvalidPluginManifest.selector));
+        vm.expectRevert(abi.encodeWithSelector(PluginManagerInternals.InvalidPluginManifest.selector)); // functionType 非法
         account.installPlugin({
             plugin: address(plugin),
             manifestHash: manifestHash,
@@ -57,6 +59,7 @@ contract ManifestValidityTest is OptimizedTest {
 
     // Tests that the plugin manager rejects a plugin with a pre-runtime validation hook set to "validation always
     // allow"
+    // 测试
     function test_ManifestValidity_invalid_ValidationAlwaysAllow_PreRuntimeValidationHook() public {
         BadValidationMagicValue_PreRuntimeValidationHook_Plugin plugin =
             new BadValidationMagicValue_PreRuntimeValidationHook_Plugin();

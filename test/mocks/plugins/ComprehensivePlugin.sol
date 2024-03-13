@@ -114,7 +114,7 @@ contract ComprehensivePlugin is BasePlugin {
         }
         revert NotImplemented();
     }
-
+    // @inheritdoc BasePlugin
     function pluginManifest() external pure override returns (PluginManifest memory) {
         PluginManifest memory manifest;
 

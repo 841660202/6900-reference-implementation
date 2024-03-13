@@ -42,7 +42,7 @@ contract ValidationIntersectionTest is OptimizedTest {
         noHookPlugin = new MockUserOpValidationPlugin();
         oneHookPlugin = new MockUserOpValidation1HookPlugin();
         twoHookPlugin = new MockUserOpValidation2HookPlugin();
-
+        // vm.startPrank 用于
         vm.startPrank(address(owner1));
         account1.installPlugin({
             plugin: address(noHookPlugin),
@@ -62,6 +62,7 @@ contract ValidationIntersectionTest is OptimizedTest {
             pluginInstallData: "",
             dependencies: new FunctionReference[](0)
         });
+        // 结束模拟
         vm.stopPrank();
     }
 

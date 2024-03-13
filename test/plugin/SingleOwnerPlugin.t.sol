@@ -30,7 +30,7 @@ contract SingleOwnerPluginTest is OptimizedTest {
     function setUp() public {
         plugin = _deploySingleOwnerPlugin();
         entryPoint = new EntryPoint();
-
+        // makeAddr 是一个辅助函数，它将字符串转换为地址。这样做是为了确保每次测试都是从已知的状态开始的。
         a = makeAddr("a");
         b = makeAddr("b");
         owner1 = makeAddr("owner1");

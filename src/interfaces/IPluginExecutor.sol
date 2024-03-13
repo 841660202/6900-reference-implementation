@@ -7,6 +7,7 @@ interface IPluginExecutor {
     /// calling plugin for the call to go through.
     /// @param data The calldata to send to the plugin.
     /// @return The return data from the call.
+    // 从插件调用插件
     function executeFromPlugin(bytes calldata data) external payable returns (bytes memory);
 
     /// @notice Execute a call from a plugin to a non-plugin address.
@@ -16,6 +17,7 @@ interface IPluginExecutor {
     /// @param value The value to send with the call.
     /// @param data The calldata to send to the target.
     /// @return The return data from the call.
+    // 从插件调用外部合约
     function executeFromPluginExternal(address target, uint256 value, bytes calldata data)
         external
         payable

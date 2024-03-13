@@ -60,7 +60,7 @@ abstract contract PluginManagerInternals is IPluginManager {
     }
 
     // Storage update operations
-
+    // 这个函数是用来设置执行函数的
     function _setExecutionFunction(bytes4 selector, address plugin) internal notNullPlugin(plugin) {
         SelectorData storage _selectorData = getAccountStorage().selectorData[selector];
 
@@ -70,13 +70,13 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _selectorData.plugin = plugin;
     }
-
+    // 这个函数是用来移除执行函数的
     function _removeExecutionFunction(bytes4 selector) internal {
         SelectorData storage _selectorData = getAccountStorage().selectorData[selector];
 
         _selectorData.plugin = address(0);
     }
-
+    // 这个函数是用来解析插件的函数的
     function _addUserOpValidationFunction(bytes4 selector, FunctionReference validationFunction)
         internal
         notNullFunction(validationFunction)
@@ -89,7 +89,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _selectorData.userOpValidation = validationFunction;
     }
-
+    // 这个函数是用来移除用户操作验证函数的
     function _removeUserOpValidationFunction(bytes4 selector, FunctionReference validationFunction)
         internal
         notNullFunction(validationFunction)
@@ -98,7 +98,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _selectorData.userOpValidation = FunctionReferenceLib._EMPTY_FUNCTION_REFERENCE;
     }
-
+    // 这个函数是用来添加运行时验证函数的
     function _addRuntimeValidationFunction(bytes4 selector, FunctionReference validationFunction)
         internal
         notNullFunction(validationFunction)
@@ -111,7 +111,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _selectorData.runtimeValidation = validationFunction;
     }
-
+    // 这个函数是用来移除运行时验证函数的
     function _removeRuntimeValidationFunction(bytes4 selector, FunctionReference validationFunction)
         internal
         notNullFunction(validationFunction)
@@ -120,7 +120,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _selectorData.runtimeValidation = FunctionReferenceLib._EMPTY_FUNCTION_REFERENCE;
     }
-
+    // 这个函数是用来添加执行钩子的
     function _addExecHooks(bytes4 selector, FunctionReference preExecHook, FunctionReference postExecHook)
         internal
     {
@@ -128,7 +128,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _addHooks(_selectorData.executionHooks, preExecHook, postExecHook);
     }
-
+    // 这个函数是用来移除执行钩子的
     function _removeExecHooks(bytes4 selector, FunctionReference preExecHook, FunctionReference postExecHook)
         internal
     {
@@ -136,7 +136,7 @@ abstract contract PluginManagerInternals is IPluginManager {
 
         _removeHooks(_selectorData.executionHooks, preExecHook, postExecHook);
     }
-
+    // 这个函数是用来添加钩子的
     function _addHooks(HookGroup storage hooks, FunctionReference preExecHook, FunctionReference postExecHook)
         internal
     {
@@ -155,7 +155,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             _addOrIncrement(hooks.postOnlyHooks, _toSetValue(postExecHook));
         }
     }
-
+    // 这个函数是用来移除钩子的
     function _removeHooks(HookGroup storage hooks, FunctionReference preExecHook, FunctionReference postExecHook)
         internal
     {
@@ -172,7 +172,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             _removeOrDecrement(hooks.postOnlyHooks, _toSetValue(postExecHook));
         }
     }
-
+    // 这个函数是用来解析插件的函数的
     function _addPreUserOpValidationHook(bytes4 selector, FunctionReference preUserOpValidationHook)
         internal
         notNullFunction(preUserOpValidationHook)
@@ -193,7 +193,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             _toSetValue(preUserOpValidationHook)
         );
     }
-
+    // 这个函数是用来解析插件的函数的
     function _addPreRuntimeValidationHook(bytes4 selector, FunctionReference preRuntimeValidationHook)
         internal
         notNullFunction(preRuntimeValidationHook)
@@ -203,7 +203,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             _toSetValue(preRuntimeValidationHook)
         );
     }
-
+    // 这个函数是用来移除运行时验证函数的
     function _removePreRuntimeValidationHook(bytes4 selector, FunctionReference preRuntimeValidationHook)
         internal
         notNullFunction(preRuntimeValidationHook)
@@ -214,7 +214,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             _toSetValue(preRuntimeValidationHook)
         );
     }
-
+    // 这个函数是用来解析插件的函数的
     function _installPlugin(
         address plugin,
         bytes32 manifestHash,
@@ -224,22 +224,26 @@ abstract contract PluginManagerInternals is IPluginManager {
         AccountStorage storage _storage = getAccountStorage();
 
         // Check if the plugin exists.
+        // 这是通过插件的地址来判断的
         if (!_storage.plugins.add(plugin)) {
             revert PluginAlreadyInstalled(plugin);
         }
 
         // Check that the plugin supports the IPlugin interface.
+        // 检测插件是否支持 IPlugin 接口
         if (!ERC165Checker.supportsInterface(plugin, type(IPlugin).interfaceId)) {
             revert PluginInterfaceNotSupported(plugin);
         }
 
         // Check manifest hash.
+        // 检查插件的 manifestHash 是否正确，为了保证插件的安全性
         PluginManifest memory manifest = IPlugin(plugin).pluginManifest();
         if (!_isValidPluginManifest(manifest, manifestHash)) {
             revert InvalidPluginManifest();
         }
 
         // Check that the dependencies match the manifest.
+        // 检查插件的依赖是否正确
         if (dependencies.length != manifest.dependencyInterfaceIds.length) {
             revert InvalidDependenciesProvided();
         }
@@ -274,6 +278,7 @@ abstract contract PluginManagerInternals is IPluginManager {
         // Update components according to the manifest.
 
         // Mark whether or not this plugin may spend native token amounts
+        // 标记插件是否可以花费原生代币
         if (manifest.canSpendNativeToken) {
             _storage.pluginData[plugin].canSpendNativeToken = true;
         }
@@ -292,6 +297,7 @@ abstract contract PluginManagerInternals is IPluginManager {
         for (uint256 i = 0; i < length;) {
             // If there are duplicates, this will just enable the flag again. This is not a problem, since the
             // boolean will be set to false twice during uninstall, which is fine.
+            // 如果有重复的，这将再次启用标志。这不是问题，因为在卸载期间，布尔值将被设置两次为false，这是可以的。
             _storage.callPermitted[getPermittedCallKey(plugin, manifest.permittedExecutionSelectors[i])] = true;
 
             unchecked {
@@ -304,19 +310,22 @@ abstract contract PluginManagerInternals is IPluginManager {
             _storage.pluginData[plugin].anyExternalExecPermitted = true;
         } else {
             // Only store the specific permitted external calls if "permit any" flag was not set.
+            // 只有在没有设置“允许任何”标志时，才存储特定的允许的外部调用
             length = manifest.permittedExternalCalls.length;
             for (uint256 i = 0; i < length;) {
+                // 获取插件的允许的外部调用
                 ManifestExternalCallPermission memory externalCallPermission = manifest.permittedExternalCalls[i];
-
+                // 获取插件的允许的外部调用的数据
                 PermittedExternalCallData storage permittedExternalCallData =
                     _storage.permittedExternalCalls[IPlugin(plugin)][externalCallPermission.externalAddress];
-
+                // 设置插件的允许的外部调用的地址
                 permittedExternalCallData.addressPermitted = true;
-
+                // 如果在构造函数中设置了“允许任何选择器”标志，只有在构造函数中设置了“允许任何选择器”标志时，才清除此标志。
                 if (externalCallPermission.permitAnySelector) {
                     permittedExternalCallData.anySelectorPermitted = true;
                 } else {
                     uint256 externalContractSelectorsLength = externalCallPermission.selectors.length;
+                    // 可以允许多个选择器，这些选择器对应的外部合约地址是一样的，这些是被允许的外部调用
                     for (uint256 j = 0; j < externalContractSelectorsLength;) {
                         permittedExternalCallData.permittedSelectors[externalCallPermission.selectors[j]] = true;
 
@@ -430,8 +439,10 @@ abstract contract PluginManagerInternals is IPluginManager {
         }
 
         // Initialize the plugin storage for the account.
+        // 初始化插件的存储
         // solhint-disable-next-line no-empty-blocks
         try IPlugin(plugin).onInstall(pluginInstallData) {}
+        
         catch (bytes memory revertReason) {
             revert PluginInstallCallbackFailed(plugin, revertReason);
         }
@@ -568,7 +579,7 @@ abstract contract PluginManagerInternals is IPluginManager {
         }
 
         // remove external call permissions
-
+        // 删除外部调用权限
         if (manifest.permitAnyExternalAddress) {
             // Only clear if it was set during install time
             _storage.pluginData[plugin].anyExternalExecPermitted = false;

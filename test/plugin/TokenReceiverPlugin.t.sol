@@ -62,16 +62,19 @@ contract TokenReceiverPluginTest is OptimizedTest, IERC1155Receiver {
 
         acct.installPlugin(address(plugin), manifestHash, "", new FunctionReference[](0));
     }
-
+// 整个测试函数的逻辑是：首先设置一个预期，即调用 safeTransferFrom 方法时会失败，并且失败的原因应该是 UpgradeableModularAccount 不认识 onERC721Received 函数。
+// 然后执行实际的代币转移操作。如果转移失败，并且失败原因与预期相符，那么测试通过；如果转移成功或失败原因不符，测试失败。
     function test_failERC721Transfer() public {
+        // 失败预期
         vm.expectRevert(
+            // abi.encodePacked 函数用于将多个参数编码为一个紧凑的字节序列
             abi.encodePacked(
                 UpgradeableModularAccount.UnrecognizedFunction.selector,
                 IERC721Receiver.onERC721Received.selector,
                 bytes28(0)
             )
         );
-        t0.safeTransferFrom(address(this), address(acct), _TOKEN_ID);
+        t0.safeTransferFrom(address(this), address(acct)/* 这个账号有没有安装插件 */, _TOKEN_ID);
     }
 
     function test_passERC721Transfer() public {

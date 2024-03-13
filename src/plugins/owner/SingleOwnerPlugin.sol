@@ -146,8 +146,8 @@ contract SingleOwnerPlugin is BasePlugin, ISingleOwnerPlugin, IERC1271 {
         manifest.executionFunctions[2] = this.owner.selector;
 
         ManifestFunction memory ownerUserOpValidationFunction = ManifestFunction({
-            functionType: ManifestAssociatedFunctionType.SELF,
-            functionId: uint8(FunctionId.USER_OP_VALIDATION_OWNER),
+            functionType: ManifestAssociatedFunctionType.SELF, // 函数类型
+            functionId: uint8(FunctionId.USER_OP_VALIDATION_OWNER), // 自定义的枚举
             dependencyIndex: 0 // Unused.
         });
         manifest.userOpValidationFunctions = new ManifestAssociatedFunction[](7);

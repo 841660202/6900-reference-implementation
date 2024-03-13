@@ -29,13 +29,14 @@ abstract contract MockBaseUserOpValidationPlugin is BaseTestPlugin {
     function onInstall(bytes calldata) external override {}
 
     function onUninstall(bytes calldata) external override {}
-
+    // userOp预验证函数
     function preUserOpValidationHook(uint8 functionId, UserOperation calldata, bytes32)
         external
         view
         override
         returns (uint256)
     {
+        // 这里根据functionId返回对应的数据
         if (functionId == uint8(FunctionId.PRE_USER_OP_VALIDATION_HOOK_1)) {
             return _preUserOpValidationHook1Data;
         } else if (functionId == uint8(FunctionId.PRE_USER_OP_VALIDATION_HOOK_2)) {
@@ -43,7 +44,7 @@ abstract contract MockBaseUserOpValidationPlugin is BaseTestPlugin {
         }
         revert NotImplemented();
     }
-
+    // 
     function userOpValidationFunction(uint8 functionId, UserOperation calldata, bytes32)
         external
         view
